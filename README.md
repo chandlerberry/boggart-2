@@ -12,11 +12,11 @@ openai_api_key: string
 > By default, the application looks for the config file at `$HOME/boggart.yml`. Set `BOGGART_CONFIG_PATH` to your custom config file if the location differs.
 
 ## Run the Application
-This project is packaged with the `uv` package manager. These instructions assume that `uv` and `git ` are installed.
+This project is packaged with the `uv` package manager. These instructions assume that `uv` and `git` are installed.
 
 1. Clone this repository
 ```bash
-git clone https://github.com/chandlerberry/boggart-2.git
+git clone https://github.com/chandlerberry/boggart-2.git && cd boggart-2
 ```
 
 2. Set up the environment

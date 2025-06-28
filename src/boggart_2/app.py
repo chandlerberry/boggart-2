@@ -25,7 +25,7 @@ class Config(BaseSettings):
     model_config = SettingsConfigDict(
         yaml_file=Path(Path.home(), 'boggart.yml')
         if not getenv('BOGGART_CONFIG_PATH')
-        else environ['BOGGART_CONFIG_PATH'],
+        else Path(environ['BOGGART_CONFIG_PATH']),
         yaml_file_encoding='utf-8',
     )
 
