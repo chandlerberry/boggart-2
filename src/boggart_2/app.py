@@ -1,4 +1,5 @@
 import logging
+from os import environ, getenv
 from pathlib import Path
 from typing import Optional
 
@@ -21,9 +22,10 @@ class Config(BaseSettings):
     openai_api_key: Optional[str] = Field(default=None)
     anthropic_api_key: Optional[str] = Field(default=None)
 
-    # todo: set config path with environment variable
     model_config = SettingsConfigDict(
-        yaml_file=Path(Path.home(), 'boggart.yml'),
+        yaml_file=Path(Path.home(), 'boggart.yml')
+        if not getenv('BOGGART_CONFIG_PATH')
+        else environ['BOGGART_CONFIG_PATH'],
         yaml_file_encoding='utf-8',
     )
 
