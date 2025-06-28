@@ -1,11 +1,10 @@
 import logging
-from os import environ
 from pathlib import Path
 from typing import Optional
 
-from discord import Intents
 from discord.ext import commands
 from pydantic import Field
+from pydantic_ai import Agent
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -13,7 +12,7 @@ from pydantic_settings import (
     YamlConfigSettingsSource,
 )
 
-from boggart_2.openai import OpenAIDiscordExtension
+from boggart_2.openai import DalleDiscordExtension
 
 
 class Config(BaseSettings):
@@ -47,19 +46,26 @@ class Config(BaseSettings):
 
 
 class Boggart(commands.Bot):
-    def __init__(self, cfg: Config, logger: logging.Logger, *args, **kwargs):
+    def __init__(
+        self,
+        cfg: Config,
+        agent: Agent,
+        logger: logging.Logger,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.cfg = cfg
         self.logger = logger
+        self.agent = agent
 
         self.command_prefix = '!'
 
     async def setup_hook(self) -> None:
         if self.cfg.openai_api_key:
-            self.logger.info('Loading OpenAI extension...')
-            environ['OPENAI_API_KEY'] = self.cfg.openai_api_key
-            await self.add_cog(OpenAIDiscordExtension(self))
-            self.logger.info('OpenAI extension loaded.')
+            self.logger.info('Loading DALLE extension...')
+            await self.add_cog(DalleDiscordExtension(self))
+            self.logger.info('DALLE extension loaded.')
 
         if self.cfg.anthropic_api_key:
             self.logger.info('Loading Anthropic extension...')
@@ -68,19 +74,12 @@ class Boggart(commands.Bot):
             # await self.add_cog(AnthropicDiscordExtension(self))
             # logger.info('Anthropic extension loaded.')
 
+    async def on_message(self, message):
+        # Don't respond to bot messages
+        if message.author == self.user:
+            return
 
-async def run_bot(cfg: Config, logger: logging.Logger):
-    if cfg.discord_token == 'NO_KEY':
-        raise ValueError('No Discord token provided')
-
-    intents = Intents.default()
-    intents.message_content = True
-
-    async with Boggart(
-        cfg,
-        logger,
-        commands.when_mentioned,
-        intents=intents,
-    ) as boggart:
-        logger.info('Starting bot...')
-        await boggart.start(cfg.discord_token)
+        if self.user in message.mentions:
+            async with message.channel.typing():
+                agent_run = await self.agent.run(message.content)
+                await message.reply(agent_run.output)
