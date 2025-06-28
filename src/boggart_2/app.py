@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from discord.ext import commands
+from discord.message import Message
 from pydantic import Field
 from pydantic_ai import Agent
 from pydantic_settings import (
@@ -59,7 +60,7 @@ class Boggart(commands.Bot):
         self.logger = logger
         self.agent = agent
 
-        self.command_prefix = '!'
+        # self.command_prefix = '!'
 
     async def setup_hook(self) -> None:
         if self.cfg.openai_api_key:
@@ -74,7 +75,7 @@ class Boggart(commands.Bot):
             # await self.add_cog(AnthropicDiscordExtension(self))
             # logger.info('Anthropic extension loaded.')
 
-    async def on_message(self, message):
+    async def on_message(self, message: Message):
         # Don't respond to bot messages
         if message.author == self.user:
             return
@@ -83,3 +84,6 @@ class Boggart(commands.Bot):
             async with message.channel.typing():
                 agent_run = await self.agent.run(message.content)
                 await message.reply(agent_run.output)
+
+        if message.content[0] == '!':
+            await self.process_commands(message)

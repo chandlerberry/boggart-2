@@ -15,15 +15,15 @@ class DalleDiscordExtension(commands.Cog):
         self.http_client = AsyncClient()
 
     @commands.command()
-    async def img(self, ctx, *, prompt):
-        image_response = await self.openai_client.images.generate(
-            model='dall-e-3',
-            prompt=prompt,
-            n=1,
-            size='1024x1024',
-        )
-
+    async def img(self, ctx, *, prompt: str):
         async with ctx.typing():
+            image_response = await self.openai_client.images.generate(
+                model='dall-e-3',
+                prompt=prompt,
+                n=1,
+                size='1024x1024',
+            )
+
             image_url = image_response.data[0].url if image_response.data else None
             revised_prompt = (
                 image_response.data[0].revised_prompt if image_response.data else None

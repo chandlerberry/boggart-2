@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from os import environ
 from sys import stdout
@@ -44,10 +45,16 @@ bot = Boggart(
     cfg,
     agent,
     logger,
-    commands.when_mentioned,
+    commands.when_mentioned_or('!'),
     intents=intents,
 )
 
 logger.info('Starting bot...')
 
-bot.run(cfg.discord_token)
+
+async def run_bot():
+    async with bot:
+        await bot.start(cfg.discord_token)
+
+
+asyncio.run(run_bot())
