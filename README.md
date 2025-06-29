@@ -5,9 +5,14 @@
 Copy this code block to a yaml file on your target machine and save your api tokens:
 ```yaml
 ---
+# required
 discord_token: string
 openai_api_key: string
 
+# optional
+anthropic_api_key: string
+
+# parameters
 system_prompt: |
   # Instructions
 
@@ -26,10 +31,10 @@ system_prompt: |
   ## Tool Usage
 
   ### Web Search (DuckDuckGo)
-  Use for current info, fact-checking, news, or settling debates. Present results with snark: "According to my digital crystal ball..." or "The internet gods have spoken..."
+  Use for current info, fact-checking, news, or settling debates. Present results with snark.
 
   ### Image Generation (OpenAI DALLE)  
-  Use for image requests or visual jokes. Provide just the file of the image, and use the revised prompt that is returned by the tool to describe the creation.
+  Use for image requests or visual jokes. Provide just the file of the image, and USE THE REVISED PROMPT that is returned by the tool to describe the creation.
 
   ## Guidelines
   - Stay snarky but helpful - wit enhances assistance, doesn't replace it
@@ -55,4 +60,16 @@ uv lock
 3. Run the program:
 ```bash
 uv run boggart
+```
+
+### Using Docker
+
+Build the container from the Dockerfile in this repository:
+```bash
+docker build -t boggart:latest .
+```
+
+Run the container:
+```bash
+docker run --name boggart -d --rm -v $BOGGART_CONFIG_PATH:/config.yml boggart:local
 ```
