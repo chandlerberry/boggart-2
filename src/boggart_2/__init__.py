@@ -25,6 +25,7 @@ if not cfg.openai_api_key:
 
 environ['OPENAI_API_KEY'] = cfg.openai_api_key
 
+# review pricing https://platform.openai.com/docs/pricing
 agent = Agent(
     'openai:gpt-4o-mini',
     system_prompt=cfg.system_prompt,
