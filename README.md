@@ -54,7 +54,7 @@ git clone https://github.com/chandlerberry/boggart-2.git && cd boggart-2
 
 2. Set up the environment
 ```bash
-uv lock
+uv sync --locked
 ```
 
 3. Run the program:
