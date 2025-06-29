@@ -1,58 +1,22 @@
 import logging
-from os import environ, getenv
-from pathlib import Path
-from typing import Optional
+from io import BytesIO
 
+from discord import File
 from discord.ext import commands
 from discord.message import Message
-from pydantic import Field
 from pydantic_ai import Agent
-from pydantic_settings import (
-    BaseSettings,
-    PydanticBaseSettingsSource,
-    SettingsConfigDict,
-    YamlConfigSettingsSource,
-)
 
+from boggart_2.config import Config
 from boggart_2.openai import DalleDiscordExtension
-
-
-class Config(BaseSettings):
-    discord_token: str = Field(default='NO_KEY')
-    openai_api_key: Optional[str] = Field(default=None)
-    anthropic_api_key: Optional[str] = Field(default=None)
-
-    model_config = SettingsConfigDict(
-        yaml_file=Path(Path.home(), 'boggart.yml')
-        if not getenv('BOGGART_CONFIG_PATH')
-        else Path(environ['BOGGART_CONFIG_PATH']),
-        yaml_file_encoding='utf-8',
-    )
-
-    @classmethod
-    def settings_customise_sources(
-        cls,
-        settings_cls: type[BaseSettings],
-        init_settings: PydanticBaseSettingsSource,
-        env_settings: PydanticBaseSettingsSource,
-        dotenv_settings: PydanticBaseSettingsSource,
-        file_secret_settings: PydanticBaseSettingsSource,
-    ) -> tuple[PydanticBaseSettingsSource, ...]:
-        super().settings_customise_sources(
-            settings_cls,
-            init_settings,
-            env_settings,
-            dotenv_settings,
-            file_secret_settings,
-        )
-        return (YamlConfigSettingsSource(settings_cls),)
+from boggart_2.types import BoggartDeps, FileResponse
 
 
 class Boggart(commands.Bot):
     def __init__(
         self,
         cfg: Config,
-        agent: Agent,
+        agent: Agent[BoggartDeps, FileResponse | str],
+        deps: BoggartDeps,
         logger: logging.Logger,
         *args,
         **kwargs,
@@ -61,8 +25,7 @@ class Boggart(commands.Bot):
         self.cfg = cfg
         self.logger = logger
         self.agent = agent
-
-        # self.command_prefix = '!'
+        self.deps = deps
 
     async def setup_hook(self) -> None:
         if self.cfg.openai_api_key:
@@ -72,7 +35,7 @@ class Boggart(commands.Bot):
 
         if self.cfg.anthropic_api_key:
             self.logger.info('Loading Anthropic extension...')
-            self.logger.info('Anthropic extension not implemented yet, ignoring...')
+            self.logger.info('Anthropic extension not implemented, ignoring...')
             # environ['ANTHROPIC_API_KEY'] = self.cfg.anthropic_api_key
             # await self.add_cog(AnthropicDiscordExtension(self))
             # logger.info('Anthropic extension loaded.')
@@ -84,8 +47,22 @@ class Boggart(commands.Bot):
 
         if self.user in message.mentions:
             async with message.channel.typing():
-                agent_run = await self.agent.run(message.content)
-                await message.reply(agent_run.output)
+                agent_run = await self.agent.run(message.content, deps=self.deps)
+
+                if isinstance(agent_run.output, FileResponse):
+                    file = await self.deps.http_client.get(
+                        agent_run.output.download_url
+                    )
+
+                    await message.reply(
+                        agent_run.output.message,
+                        file=File(
+                            fp=BytesIO(file.content), filename=agent_run.output.filename
+                        ),
+                    )
+
+                if isinstance(agent_run.output, str):
+                    await message.reply(agent_run.output)
 
         if message.content[0] == '!':
             await self.process_commands(message)
