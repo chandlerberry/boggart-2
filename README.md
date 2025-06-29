@@ -66,7 +66,7 @@ uv run boggart
 
 Build the container from the Dockerfile in this repository:
 ```bash
-docker build -t boggart:latest .
+docker build -t boggart:local .
 ```
 
 Run the container:
