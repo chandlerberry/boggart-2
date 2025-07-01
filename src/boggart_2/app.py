@@ -5,7 +5,6 @@ from discord.message import Message
 from pydantic_ai import Agent
 
 from boggart_2.config import Config
-from boggart_2.openai import DalleDiscordExtension
 from boggart_2.types import BoggartDeps
 
 
@@ -24,19 +23,6 @@ class Boggart(commands.Bot):
         self.logger = logger
         self.agent = agent
         self.deps = deps
-
-    async def setup_hook(self) -> None:
-        if self.cfg.openai_api_key:
-            self.logger.info('Loading DALLE extension...')
-            await self.add_cog(DalleDiscordExtension(self))
-            self.logger.info('DALLE extension loaded.')
-
-        if self.cfg.anthropic_api_key:
-            self.logger.info('Loading Anthropic extension...')
-            self.logger.info('Anthropic extension not implemented, ignoring...')
-            # environ['ANTHROPIC_API_KEY'] = self.cfg.anthropic_api_key
-            # await self.add_cog(AnthropicDiscordExtension(self))
-            # logger.info('Anthropic extension loaded.')
 
     async def on_message(self, message: Message):
         # Don't respond to bot messages
