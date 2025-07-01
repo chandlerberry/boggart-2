@@ -13,7 +13,7 @@ from pydantic_ai.common_tools.duckduckgo import duckduckgo_search_tool
 from boggart_2.agent import generate_image
 from boggart_2.app import Boggart
 from boggart_2.config import Config
-from boggart_2.types import BoggartDeps, FileResponse
+from boggart_2.types import BoggartDeps
 
 cfg = Config()
 
@@ -29,7 +29,7 @@ environ['OPENAI_API_KEY'] = cfg.openai_api_key
 agent = Agent(
     'openai:gpt-4o-mini',
     system_prompt=cfg.system_prompt,
-    output_type=[str, FileResponse],
+    output_type=str,
     deps_type=BoggartDeps,
     # Getting a type checker warning from pyright that this is not valid, but it works. I think the type annotation needs to be adjusted.
     tools=[Tool(generate_image, takes_ctx=True), duckduckgo_search_tool()],

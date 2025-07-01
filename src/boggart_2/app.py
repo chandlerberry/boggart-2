@@ -1,21 +1,19 @@
 import logging
-from io import BytesIO
 
-from discord import File
 from discord.ext import commands
 from discord.message import Message
 from pydantic_ai import Agent
 
 from boggart_2.config import Config
 from boggart_2.openai import DalleDiscordExtension
-from boggart_2.types import BoggartDeps, FileResponse
+from boggart_2.types import BoggartDeps
 
 
 class Boggart(commands.Bot):
     def __init__(
         self,
         cfg: Config,
-        agent: Agent[BoggartDeps, FileResponse | str],
+        agent: Agent[BoggartDeps, str],
         deps: BoggartDeps,
         logger: logging.Logger,
         *args,
@@ -47,22 +45,14 @@ class Boggart(commands.Bot):
 
         if self.user in message.mentions:
             async with message.channel.typing():
+                self.deps.discord_message = message
                 agent_run = await self.agent.run(message.content, deps=self.deps)
 
-                if isinstance(agent_run.output, FileResponse):
-                    file = await self.deps.http_client.get(
-                        agent_run.output.download_url
-                    )
-
-                    await message.reply(
-                        agent_run.output.message,
-                        file=File(
-                            fp=BytesIO(file.content), filename=agent_run.output.filename
-                        ),
-                    )
-
-                if isinstance(agent_run.output, str):
-                    await message.reply(agent_run.output)
+                self.logger.info(
+                    f'Recieved response from agent: {agent_run.output[:30]}...'
+                )
+                await message.channel.send(agent_run.output)
+                self.deps.discord_message = None
 
         if message.content[0] == '!':
             await self.process_commands(message)

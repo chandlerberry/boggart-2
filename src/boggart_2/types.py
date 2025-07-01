@@ -1,17 +1,13 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Optional
 
+from discord import Message
 from httpx import AsyncClient
 from openai import AsyncOpenAI
-from pydantic import BaseModel
 
 
 @dataclass
 class BoggartDeps:
     openai_client: AsyncOpenAI
     http_client: AsyncClient
-
-
-class FileResponse(BaseModel):
-    message: str
-    filename: str
-    download_url: str
+    discord_message: Optional[Message] = field(default=None)
