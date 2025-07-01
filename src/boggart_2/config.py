@@ -12,10 +12,10 @@ from pydantic_settings import (
 
 
 class Config(BaseSettings):
-    discord_token: str = Field(default='NO_KEY')
-    system_prompt: str = Field(default='You are a helpful assistant named Boggart.')
+    discord_token: Optional[str] = Field(default=None)
     openai_api_key: Optional[str] = Field(default=None)
     anthropic_api_key: Optional[str] = Field(default=None)
+    system_prompt: str = Field(default='You are a helpful assistant named Boggart.')
 
     model_config = SettingsConfigDict(
         yaml_file=Path(Path.home(), 'boggart.yml')

@@ -42,3 +42,8 @@ class Boggart(commands.Bot):
 
         if message.content[0] == '!':
             await self.process_commands(message)
+
+
+async def run_bot(bot: Boggart, token: str):
+    async with bot:
+        await bot.start(token)

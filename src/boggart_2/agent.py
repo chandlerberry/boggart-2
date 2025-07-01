@@ -30,7 +30,6 @@ async def generate_image(ctx: RunContext[BoggartDeps]) -> bool:
     if image_url and revised_prompt and ctx.deps.discord_message:
         file = await ctx.deps.http_client.get(image_url)
 
-        # todo: prevent model from overriding revised prompt from the dalle output
         await ctx.deps.discord_message.reply(
             revised_prompt,
             file=File(
