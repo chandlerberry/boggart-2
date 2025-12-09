@@ -12,6 +12,7 @@ from pydantic_settings import (
 
 
 class Config(BaseSettings):
+    model: str = Field(default='openai:gpt-4o-mini')
     discord_token: Optional[str] = Field(default=None)
     openai_api_key: Optional[str] = Field(default=None)
     anthropic_api_key: Optional[str] = Field(default=None)

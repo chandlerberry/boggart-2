@@ -38,4 +38,7 @@ indent-width = 4
 [tool.ruff.format]
 quote-style = "single"
 
-
+[tool.pyright]
+venvPath='.'
+venv=".venv"
+exclude=['.venv']

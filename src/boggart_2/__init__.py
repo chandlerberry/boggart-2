@@ -13,7 +13,7 @@ from pydantic_ai.common_tools.duckduckgo import duckduckgo_search_tool
 from boggart_2.agent import generate_image
 from boggart_2.app import Boggart, run_bot
 from boggart_2.config import Config
-from boggart_2.types import BoggartDeps
+from boggart_2.types import Deps
 
 # configure logging
 stream_handler = logging.StreamHandler(stream=stdout)
@@ -38,32 +38,33 @@ if not cfg.discord_token:
 
 if not cfg.openai_api_key:
     raise ValueError('No OpenAI API key provided')
-
 environ['OPENAI_API_KEY'] = cfg.openai_api_key
 
 # review pricing https://platform.openai.com/docs/pricing
 agent = Agent(
-    'openai:gpt-4o-mini',
+    cfg.model,
     system_prompt=cfg.system_prompt,
     output_type=str,
-    deps_type=BoggartDeps,
-    # Getting a type checker warning from pyright that this is not valid, but it works. I think the type annotation needs to be adjusted.
-    tools=[Tool(generate_image, takes_ctx=True), duckduckgo_search_tool()],
+    deps_type=Deps,
+    tools=[
+        Tool(generate_image, takes_ctx=True),
+        duckduckgo_search_tool(),  # type: ignore - this is a default search tool that takes no dependencies
+    ],
 )
 
-# initialize client dependencies
-deps = BoggartDeps(openai_client=AsyncOpenAI(), http_client=AsyncClient())
+deps = Deps(
+    openai_client=AsyncOpenAI(),
+    http_client=AsyncClient(),
+    logger=logger,
+)
 
-# create bot
 bot = Boggart(
     cfg,
     agent,
     deps,
-    logger,
     commands.when_mentioned_or('!'),
     intents=intents,
 )
-
 
 logger.info('Starting bot...')
 asyncio.run(run_bot(bot, cfg.discord_token))

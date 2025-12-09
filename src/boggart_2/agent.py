@@ -4,10 +4,10 @@ from uuid import uuid4
 from discord import File
 from pydantic_ai import RunContext
 
-from boggart_2.types import BoggartDeps
+from boggart_2.types import Deps
 
 
-async def generate_image(ctx: RunContext[BoggartDeps]) -> bool:
+async def generate_image(ctx: RunContext[Deps]) -> bool:
     """
     Generate an image using DALLE-3 via the OpenAI API
     """
