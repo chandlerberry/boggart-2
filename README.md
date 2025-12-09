@@ -10,6 +10,7 @@ discord_token: string
 openai_api_key: string
 
 # optional
+model: openai:gpt-4o-mini
 anthropic_api_key: string
 
 # parameters
