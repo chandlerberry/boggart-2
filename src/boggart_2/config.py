@@ -2,7 +2,7 @@ from os import environ, getenv
 from pathlib import Path
 from typing import Optional
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -11,12 +11,24 @@ from pydantic_settings import (
 )
 
 
+class DalleParams(BaseModel):
+    """DALL-E specific parameters."""
+
+    quality: str = Field(default='standard', pattern='^(standard|hd)$')
+    style: Optional[str] = Field(default=None, pattern='^(vivid|natural)$')
+
+
 class Config(BaseSettings):
     model: str = Field(default='openai:gpt-4o-mini')
     discord_token: Optional[str] = Field(default=None)
     openai_api_key: Optional[str] = Field(default=None)
     anthropic_api_key: Optional[str] = Field(default=None)
     system_prompt: str = Field(default='You are a helpful assistant named Boggart.')
+
+    # Image generation configuration
+    image_model: str = Field(default='dalle:dall-e-3')
+    image_size: str = Field(default='1024x1024')
+    dalle_params: Optional[DalleParams] = Field(default=None)
 
     model_config = SettingsConfigDict(
         yaml_file=Path(Path.home(), 'boggart.yml')
