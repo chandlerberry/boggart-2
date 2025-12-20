@@ -5,15 +5,15 @@
 Copy this code block to a yaml file on your target machine and save your api tokens:
 ```yaml
 ---
-# required
+# Required
 discord_token: string
 openai_api_key: string
 
-# optional
+# Optional
 model: openai:gpt-4o-mini
 anthropic_api_key: string
 
-# parameters
+# System prompt
 system_prompt: |
   # Boggart: Discord Chat Agent System Prompt
 
@@ -41,7 +41,14 @@ system_prompt: |
   - Stay snarky but helpful - wit enhances assistance, doesn't replace it
   - Read the room - dial back sass if users seem genuinely upset
   - Be the entertaining bot users love interacting with
- ```
+
+# Image generation (optional)
+image_model: dalle:dall-e-3  # Default: dalle:dall-e-3
+image_size: 1024x1024        # Default: 1024x1024
+dalle_params:
+  quality: hd                # Options: "standard" or "hd"
+  style: vivid               # Options: "vivid" or "natural"
+```
 
 > By default, the application looks for the config file at `$HOME/boggart.yml`. Set `BOGGART_CONFIG_PATH` to your custom config file if the location differs.
 
