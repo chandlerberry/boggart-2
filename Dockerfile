@@ -1,10 +1,9 @@
-FROM ghcr.io/astral-sh/uv:alpine3.21
+FROM astral/uv:python3.13-trixie
 
-ADD . /app
+COPY . .
 
-WORKDIR /app
 RUN uv sync --locked --compile-bytecode
 
-ENV BOGGART_CONFIG_PATH=/config.yml
+ENV BOGGART_CONFIG_PATH="/config.yml"
 
 CMD ["uv", "run", "boggart"]

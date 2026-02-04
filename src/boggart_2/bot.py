@@ -2,8 +2,7 @@ from discord.ext import commands
 from discord.message import Message
 from pydantic_ai import Agent
 
-from boggart_2.config import Config
-from boggart_2.types import Deps
+from boggart_2.config import Config, Deps
 
 
 class Boggart(commands.Bot):

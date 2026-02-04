@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Optional, Protocol
 
-from httpx import AsyncClient
 from openai import AsyncOpenAI
 
 if TYPE_CHECKING:
@@ -123,7 +122,7 @@ class DalleImageProvider:
         image_data = response.data[0]
 
         return ImageResult(
-            url=image_data.url,
+            url=str(image_data.url),
             revised_prompt=image_data.revised_prompt,
             metadata={
                 'model': self.model,
@@ -134,11 +133,7 @@ class DalleImageProvider:
         )
 
 
-def create_image_provider(
-    cfg: 'Config',
-    openai_client: AsyncOpenAI,
-    http_client: AsyncClient,
-) -> ImageProvider:
+def create_image_provider(cfg: 'Config', openai_client: AsyncOpenAI) -> ImageProvider:
     """Factory function to create an image provider based on configuration.
 
     Args:

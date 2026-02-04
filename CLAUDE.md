@@ -49,9 +49,7 @@ docker run --name boggart -d --rm -v $BOGGART_CONFIG_PATH:/config.yml boggart:lo
 
 **Image Providers (`image_providers.py`)**: Pluggable provider system for image generation. Defines `ImageProvider` protocol for clean abstraction, `ImageResult` dataclass for structured results, and provider implementations (currently DALL-E 3). The `create_image_provider()` factory function instantiates providers based on configuration. Provider selection uses a unified model string format (e.g., `"dalle:dall-e-3"`).
 
-**Configuration (`config.py`)**: Uses Pydantic Settings to load configuration from a YAML file (default: `~/boggart.yml`, override with `BOGGART_CONFIG_PATH`). Manages API keys, model selection, system prompt, and image generation settings. Includes provider-specific Pydantic models (e.g., `DalleParams`) for type-safe validation.
-
-**Dependencies (`types.py`)**: Defines the `Deps` dataclass used for dependency injection throughout the agent. Contains shared clients (OpenAI, HTTP), logger, image provider instance, and optional Discord message context for tool use.
+**Configuration (`config.py`)**: Uses Pydantic Settings to load configuration from a YAML file (default: `~/boggart.yml`, override with `BOGGART_CONFIG_PATH`). Manages API keys, model selection, system prompt, and image generation settings. Includes provider-specific Pydantic models (e.g., `DalleParams`) for type-safe validation. Also defines the `Deps` dataclass used for dependency injection throughout the agent, containing shared clients (OpenAI, HTTP), logger, image provider instance, and optional Discord message context for tool use.
 
 ### Data Flow
 
@@ -89,8 +87,7 @@ src/boggart_2/
 ├── bot.py               # Discord bot implementation
 ├── tools.py             # Custom agent tools
 ├── image_providers.py   # Image provider abstraction and implementations
-├── config.py            # Configuration management
-└── types.py             # Type definitions and dependencies
+└── config.py            # Configuration management and dependency injection
 ```
 
 ## Configuration

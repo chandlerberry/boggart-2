@@ -1,7 +1,12 @@
+from dataclasses import dataclass, field
+from logging import Logger
 from os import environ, getenv
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
+from discord import Message
+from httpx import AsyncClient
+from openai import AsyncOpenAI
 from pydantic import BaseModel, Field
 from pydantic_settings import (
     BaseSettings,
@@ -9,6 +14,22 @@ from pydantic_settings import (
     SettingsConfigDict,
     YamlConfigSettingsSource,
 )
+
+if TYPE_CHECKING:
+    from boggart_2.image_providers import ImageProvider
+
+
+@dataclass
+class MemoryDeps: ...
+
+
+@dataclass
+class Deps:
+    openai_client: AsyncOpenAI
+    http_client: AsyncClient
+    logger: Logger
+    image_provider: 'ImageProvider'
+    discord_message: Optional[Message] = field(default=None)
 
 
 class DalleParams(BaseModel):
@@ -19,10 +40,13 @@ class DalleParams(BaseModel):
 
 
 class Config(BaseSettings):
-    model: str = Field(default='openai:gpt-4o-mini')
+    model: str = Field(
+        default='anthropic/claude-haiku-4.5',
+        description='Model name as detailed in the Vercel AI Gateway model list',
+    )
     discord_token: Optional[str] = Field(default=None)
     openai_api_key: Optional[str] = Field(default=None)
-    anthropic_api_key: Optional[str] = Field(default=None)
+    vercel_ai_gateway_api_key: str = Field()
     system_prompt: str = Field(default='You are a helpful assistant named Boggart.')
 
     # Image generation configuration

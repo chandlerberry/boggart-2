@@ -4,7 +4,7 @@ from uuid import uuid4
 from discord import File
 from pydantic_ai import RunContext
 
-from boggart_2.types import Deps
+from boggart_2.config import Deps
 
 
 async def generate_image(ctx: RunContext[Deps]) -> bool:

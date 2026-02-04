@@ -9,12 +9,13 @@ from httpx import AsyncClient
 from openai import AsyncOpenAI
 from pydantic_ai import Agent, Tool
 from pydantic_ai.common_tools.duckduckgo import duckduckgo_search_tool
+from pydantic_ai.models.openai import OpenAIChatModel
+from pydantic_ai.providers.vercel import VercelProvider
 
-from boggart_2.tools import generate_image
 from boggart_2.bot import Boggart, run_bot
-from boggart_2.config import Config
+from boggart_2.config import Config, Deps
 from boggart_2.image_providers import create_image_provider
-from boggart_2.types import Deps
+from boggart_2.tools import generate_image
 
 
 def setup_logging() -> logging.Logger:
@@ -46,7 +47,6 @@ def create_deps(cfg: Config, logger: logging.Logger) -> Deps:
     image_provider = create_image_provider(
         cfg=cfg,
         openai_client=openai_client,
-        http_client=http_client,
     )
 
     return Deps(
@@ -60,7 +60,10 @@ def create_deps(cfg: Config, logger: logging.Logger) -> Deps:
 def create_agent(cfg: Config) -> Agent[Deps, str]:
     """Create and configure the Pydantic AI agent with tools."""
     return Agent(
-        cfg.model,
+        OpenAIChatModel(
+            cfg.model,
+            provider=VercelProvider(api_key=cfg.vercel_ai_gateway_api_key),
+        ),
         system_prompt=cfg.system_prompt,
         output_type=str,
         deps_type=Deps,

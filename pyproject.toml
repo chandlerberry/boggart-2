@@ -13,7 +13,7 @@ dependencies = [
     "httpx>=0.28.1",
     "openai>=1.91.0",
     "pydantic>=2.11.7",
-    "pydantic-ai-slim[anthropic,duckduckgo,mcp,openai]>=0.3.4",
+    "pydantic-ai-slim[openai,duckduckgo]>=1.52.0",
     "pydantic-settings>=2.10.1",
     "pyyaml>=6.0.2",
 ]

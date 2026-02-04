@@ -8,10 +8,10 @@ Copy this code block to a yaml file on your target machine and save your api tok
 # Required
 discord_token: string
 openai_api_key: string
+vercel_ai_gateway_api_key: string
 
 # Optional
-model: openai:gpt-4o-mini
-anthropic_api_key: string
+model: anthropic/claude-haiku-4.5  # Default: anthropic/claude-haiku-4.5 (use Vercel AI Gateway model names)
 
 # System prompt
 system_prompt: |
